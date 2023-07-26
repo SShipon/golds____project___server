@@ -27,6 +27,26 @@ async function run() {
     const goldCollection = client.db('goldStore').collection('gold-collection');
     const bookingCollection = client.db('goldStore').collection('booking');
 
+
+
+    //get booking data from database for show booking in ddashboard
+    app.get('/booking', async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const bookings = await bookingCollection.find(query).toArray();
+      res.send(bookings);
+    });
+
+
+    //post booking data to database
+    app.post('/booking', async (req, res) => {
+      const booking = req.body;
+      const result = await bookingCollection.insertOne(booking);
+      console.log(result);
+      res.send(result);
+    });
+
+
     app.get('/golds', async (req, res) => {
       const cursor = goldCollection.find();
       const result = await cursor.toArray();
@@ -40,20 +60,7 @@ async function run() {
       res.send(result);
     });
 
-    //post booking data to database
-    app.post('/booking', async (req, res) => {
-      const booking = req.body;
-      const result = await bookingCollection.insertOne(booking);
-      res.send(result);
-    });
 
-    //get booking data from database for show booking in ddashboard
-    app.get('/booking', async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
-      const bookings = await bookingCollection.find(query).toArray;
-      res.send(bookings);
-    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
