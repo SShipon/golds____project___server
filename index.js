@@ -47,7 +47,13 @@ async function run() {
       res.send(result);
     });
 
-
+    //get booking data from database for show booking in ddashboard
+    app.get('/booking', async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const bookings = await bookingCollection.find(query).toArray;
+      res.send(bookings);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
