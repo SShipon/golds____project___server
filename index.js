@@ -43,7 +43,7 @@ async function run() {
       const booking = req.body;
       const result = await bookingCollection.insertOne(booking);
       console.log(result);
-      res.send(result);
+      // res.send(result);
     });
 
 
