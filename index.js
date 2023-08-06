@@ -1,6 +1,8 @@
 const express = require('express');
+const SSLCommerzPayment = require('sslcommerz-lts');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
+var jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -19,6 +21,15 @@ const client = new MongoClient(uri, {
   },
 });
 
+
+const store_id = process.env.STORE_ID
+const store_passwd = process.env.STORE_PASSWORD
+const is_live = false //true for live, false for sandbox
+
+
+
+
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -28,11 +39,21 @@ async function run() {
     const bookingCollection = client.db('goldStore').collection('booking');
 
 
+    //jwt
+    app.post('/login', async (req, res) => {
+      const user = req.body;
+      var token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn:'1d'
+      });
+      res.send({ token });
+    })
+
 
     //get booking data from database for show booking in ddashboard
     app.get('/booking', async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
+      const newEmail = req.query.email;
+      const query = { email: newEmail };
+      //email holo mongodb te user email er nam
       const bookings = await bookingCollection.find(query).toArray();
       res.send(bookings);
     });
@@ -43,7 +64,7 @@ async function run() {
       const booking = req.body;
       const result = await bookingCollection.insertOne(booking);
       console.log(result);
-      // res.send(result);
+       res.send(result);
     });
 
 
