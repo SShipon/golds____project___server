@@ -36,6 +36,9 @@ async function run() {
     await client.connect();
 
     const goldCollection = client.db('goldStore').collection('gold-collection');
+    const diamondCollection = client.db('goldStore').collection('diamond-collection');
+    const platinumCollection = client.db('goldStore').collection('platinum-collection');
+    const pearlCollection = client.db('goldStore').collection('pearl-collection');
     const bookingCollection = client.db('goldStore').collection('booking');
 
 
@@ -81,6 +84,21 @@ async function run() {
       res.send(result);
     });
 
+    //diamond
+    app.get('/diamonds', async (req, res) => {
+      const diamond = await diamondCollection.find().toArray();
+      res.send(diamond)
+    })
+    //platinums
+    app.get('/platinums', async (req, res) => {
+      const platinum = await platinumCollection.find().toArray();
+      res.send(platinum);
+    })
+    ///pearls
+    app.get('/pearls', async (req, res) => {
+      const pearl = await pearlCollection.find().toArray();
+      res.send(pearl)
+    })
 
   } finally {
     // Ensures that the client will close when you finish/error
