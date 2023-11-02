@@ -21,14 +21,9 @@ const client = new MongoClient(uri, {
   },
 });
 
-
-const store_id = process.env.STORE_ID
-const store_passwd = process.env.STORE_PASSWORD
-const is_live = false //true for live, false for sandbox
-
-
-
-
+const store_id = process.env.STORE_ID;
+const store_passwd = process.env.STORE_PASSWORD;
+const is_live = false; //true for live, false for sandbox
 
 async function run() {
   try {
@@ -36,21 +31,34 @@ async function run() {
     await client.connect();
 
     const goldCollection = client.db('goldStore').collection('gold-collection');
-    const diamondCollection = client.db('goldStore').collection('diamond-collection');
-    const platinumCollection = client.db('goldStore').collection('platinum-collection');
-    const pearlCollection = client.db('goldStore').collection('pearl-collection');
+    const diamondCollection = client
+      .db('goldStore')
+      .collection('diamond-collection');
+    const platinumCollection = client
+      .db('goldStore')
+      .collection('platinum-collection');
+    const pearlCollection = client
+      .db('goldStore')
+      .collection('pearl-collection');
     const bookingCollection = client.db('goldStore').collection('booking');
-
 
     //jwt
     app.post('/login', async (req, res) => {
       const user = req.body;
       var token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn:'1d'
+        expiresIn: '1d',
       });
       res.send({ token });
-    })
+    });
 
+    // cart item DELETE
+    app.delete('/cartItem/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await bookingCollection.deleteOne(query);
+      res.send(result);
+
+    })
 
     //get booking data from database for show booking in ddashboard
     app.get('/booking', async (req, res) => {
@@ -61,19 +69,11 @@ async function run() {
       res.send(bookings);
     });
 
-
     //post booking data to database
     app.post('/booking', async (req, res) => {
       const booking = req.body;
       const result = await bookingCollection.insertOne(booking);
       console.log(result);
-       res.send(result);
-    });
-
-
-    app.get('/golds', async (req, res) => {
-      const cursor = goldCollection.find();
-      const result = await cursor.toArray();
       res.send(result);
     });
 
@@ -84,22 +84,38 @@ async function run() {
       res.send(result);
     });
 
+    //gold
+    app.get('/golds', async (req, res) => {
+      const cursor = goldCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     //diamond
     app.get('/diamonds', async (req, res) => {
       const diamond = await diamondCollection.find().toArray();
-      res.send(diamond)
+      res.send(diamond);
+    });
+
+    app.get('/diamonds/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await diamondCollection.findOne(query);
+      res.send(result);
+      
     })
+
     //platinums
     app.get('/platinums', async (req, res) => {
       const platinum = await platinumCollection.find().toArray();
       res.send(platinum);
-    })
+    });
+    
     ///pearls
     app.get('/pearls', async (req, res) => {
       const pearl = await pearlCollection.find().toArray();
-      res.send(pearl)
-    })
-
+      res.send(pearl);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
