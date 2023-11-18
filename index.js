@@ -91,7 +91,7 @@ async function run() {
       res.send(result);
     });
 
-    //diamond
+    //diamond api
     app.get('/diamonds', async (req, res) => {
       const diamond = await diamondCollection.find().toArray();
       res.send(diamond);
